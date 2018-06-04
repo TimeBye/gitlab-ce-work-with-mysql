@@ -11,11 +11,8 @@ RUN apt-get update -q && \
     gcc \
     cron
 
-RUN /opt/gitlab/embedded/bin/gem install mysql2 -v '0.4.5' -- --with-mysql-lib=/usr/lib64/mysql
-
 RUN cd /opt/gitlab/embedded/service/gitlab-rails && \
     rm -rf .bundle && \
-    gem install charlock_holmes -v '0.7.5' && \
     /opt/gitlab/embedded/bin/bundle install --deployment --without development test aws kerberos
 
 COPY entrypoint.sh .
