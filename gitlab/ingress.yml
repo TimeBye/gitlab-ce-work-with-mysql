@@ -1,0 +1,18 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/tls-acme: "true"
+  name: gitlab-ingress
+spec:
+  rules:
+  - host: demo.gitlab.com.cn
+    http:
+      paths:
+      - backend:
+          serviceName: gitlab
+          servicePort: 80
+  tls:
+  - hosts:
+    - demo.gitlab.com.cn
+    secretName: gitlab-cert

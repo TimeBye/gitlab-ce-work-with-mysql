@@ -1,0 +1,82 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: gitlab
+  name: prod-gitlab
+  namespace: choerodon-devops-prod
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: gitlab
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: gitlab
+    spec:
+      containers:
+      - env:
+        - name: GITLAB_BACKUP_SCHEDULE
+          value: daily
+        image: gitlab-ce:10.8.3-ce.0
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 10
+          httpGet:
+            path: /help
+            port: 80
+            scheme: HTTP
+          initialDelaySeconds: 600
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 15
+        name: prod-gitlab
+        ports:
+        - containerPort: 80
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /help
+            port: 80
+            scheme: HTTP
+          initialDelaySeconds: 120
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 15
+        resources:
+          limits:
+            memory: 4Gi
+          requests:
+            memory: 3Gi
+        volumeMounts:
+        - mountPath: /certs
+          name: gitlab-data
+          subPath: gitlab/data/certs
+        - mountPath: /var/log/gitlab
+          name: gitlab-data
+          subPath: gitlab/data/logs
+        - mountPath: /var/opt/gitlab
+          name: gitlab-data
+          subPath: gitlab/data/data
+        - mountPath: /etc/gitlab
+          name: gitlab-data
+          subPath: gitlab/data/config
+        - mountPath: /opt/choerodon/paas/etc/gitlab.rb
+          name: gitlab-config
+          subPath: gitlab.rb
+      volumes:
+      - name: gitlab-data
+        persistentVolumeClaim:
+          claimName: prod-gitlab-pvc
+      - configMap:
+          defaultMode: 420
+          name: prod-gitlab-config
+        name: gitlab-config
