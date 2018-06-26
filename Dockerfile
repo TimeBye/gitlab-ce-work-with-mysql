@@ -1,4 +1,4 @@
-FROM gitlab/gitlab-ce:10.8.4-ce.0
+FROM gitlab/gitlab-ce:10.8.5-ce.0
 
 RUN apt-get update -q && \
     DEBIAN_FRONTEND=noninteractive apt-get install -yq --no-install-recommends \
