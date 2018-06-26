@@ -27,5 +27,5 @@ COPY entrypoint.sh .
 # 配置自定义的oauth2认证
 COPY customize_oauth.rb /opt/gitlab/embedded/service/gitlab-rails/config/initializers/
 # 修改默认时区
-RUN cp -f /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+# RUN cp -f /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 CMD [ "bash","entrypoint.sh" ]
