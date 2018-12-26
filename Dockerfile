@@ -1,4 +1,4 @@
-FROM gitlab/gitlab-ce:11.4.7-ce.0
+FROM gitlab/gitlab-ce:11.6.0-ce.0
 
 RUN apt-get update -q && \
     DEBIAN_FRONTEND=noninteractive apt-get install -yq --no-install-recommends \
@@ -19,7 +19,7 @@ RUN apt-get update -q && \
     rm -rf /var/lib/apt/lists/* && \
     curl -sSL https://rvm.io/mpapis.asc | gpg2 --import - && curl -L get.rvm.io | bash -s stable
     
-RUN /bin/bash -l -c "rvm requirements && rvm install 2.4.4 && rvm use 2.4.4 && gem install bundler --no-ri --no-rdoc"
+RUN /bin/bash -l -c "rvm requirements && rvm install 2.5.3 && rvm use 2.5.3 && gem install bundler --no-ri --no-rdoc"
 RUN /bin/bash -l -c "cd /opt/gitlab/embedded/service/gitlab-rails && \
                      rm -rf .bundle/config && \
                      bundle install --deployment --without development test aws kerberos"
