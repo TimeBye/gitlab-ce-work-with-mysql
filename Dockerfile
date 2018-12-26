@@ -17,7 +17,9 @@ RUN apt-get update -q && \
         libre2-dev \
         libmysqlclient-dev && \ 
     rm -rf /var/lib/apt/lists/* && \
-    curl -sSL https://rvm.io/mpapis.asc | gpg2 --import - && curl -L get.rvm.io | bash -s stable
+    curl -sSL https://rvm.io/mpapis.asc | gpg2 --import - && \
+    curl -sSL https://rvm.io/pkuczynski.asc | gpg2 --import - && \
+    curl -L get.rvm.io | bash -s stable
     
 RUN /bin/bash -l -c "rvm requirements && rvm install 2.4.4 && rvm use 2.4.4 && gem install bundler --no-ri --no-rdoc"
 RUN /bin/bash -l -c "cd /opt/gitlab/embedded/service/gitlab-rails && \
