@@ -1,4 +1,4 @@
-FROM gitlab/gitlab-ce:11.6.3-ce.0
+FROM gitlab/gitlab-ce:11.6.4-ce.0
 
 RUN apt-get update -q && \
     DEBIAN_FRONTEND=noninteractive apt-get install -yq --no-install-recommends \
