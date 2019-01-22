@@ -25,8 +25,13 @@ RUN /bin/bash -l -c "rvm requirements && rvm install 2.4.5 && rvm use 2.4.5 && g
 RUN /bin/bash -l -c "cd /opt/gitlab/embedded/service/gitlab-rails && \
                      rm -rf .bundle/config && \
                      bundle install --deployment --without development test aws kerberos"
+                     
 # Issues https://gitlab.com/gitlab-org/gitlab-ce/issues/43514
-RUN sed -i 's/create_table.*/create_table :lfs_file_locks, options: '"'ROW_FORMAT=DYNAMIC'"' do |t|/' /opt/gitlab/embedded/service/gitlab-rails/db/migrate/20180116193854_create_lfs_file_locks.rb
+# Mysql2::Error: Data too long for column 'query' at row 1: INSERT INTO `prometheus_metrics`
+RUN sed -i 's/create_table.*/create_table :lfs_file_locks, options: '"'ROW_FORMAT=DYNAMIC'"' do |t|/' /opt/gitlab/embedded/service/gitlab-rails/db/migrate/20180116193854_create_lfs_file_locks.rb && \
+    sed -i 's/t.string :query/t.text :query/' /opt/gitlab/embedded/service/gitlab-rails/db/migrate/20180101160629_create_prometheus_metrics.rb && \
+    sed -i 's/t.string "query"/t.text "query"/' /opt/gitlab/embedded/service/gitlab-rails/db/schema.rb
+
 COPY entrypoint.sh .
 # 配置自定义的oauth2认证
 COPY customize_oauth.rb /opt/gitlab/embedded/service/gitlab-rails/config/initializers/
