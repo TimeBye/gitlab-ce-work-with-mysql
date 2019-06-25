@@ -17,7 +17,7 @@ docker build -t gitlab-ce:10.8.3-ce.0 .
 ---|---
 GITLAB_BACKUP_SCHEDULE | 设置自动备份。选项有：`disable`, `daily`, `weekly`,`monthly`或者`advanced`。 默认是`disable`即禁用；`daily`为每天进行备份；`weekly`为每周星期天备份；`monthly`为每月1号进行备份；`advanced`为全自定义，备份时间格式与cron相同。
 GITLAB_BACKUP_TIME | 若选择备份策略为`daily`, `weekly`,`monthly`，自动备份的时间格式为HH:MM，默认是01:00；若选择备份策略为`advanced`，自动备份的时间格式为* * * * *，默认是00 01 * * *,即每天1点进行备份。
-GITLAB_BACKUP_SKIP | 选项有：`db`, `uploads` (attachments), `repositories`, `builds`(CI build output logs), `artifacts` (CI build artifacts), `lfs` (LFS objects)，默认为`repositories`
+GITLAB_BACKUP_SKIP | 选项有：`db`, `uploads` (attachments), `repositories`, `builds`(CI build output logs), `artifacts` (CI build artifacts), `lfs` (LFS objects)，默认为`builds`
 GITLAB_BACKUP_EXPIRY | 备份的数据多久（单位：秒）后进行删除。不进行自动删除则设置为0, 开启自动备份功能，默认是7天后进行删除，即604800秒。
 
 - 通过ConfigMap挂载gitlab.rb配置文件
@@ -198,18 +198,18 @@ gitlab-ctl start
 
 修改数据库参数
 
-```
-# Aliyun RDS通过界面控制台修改:
+```sql
+-- Aliyun RDS通过界面控制台修改:
 innodb_large_prefix = ON
 
-# 自建Mysql执行以下sql
+-- 自建Mysql执行以下sql
 set global innodb_file_format = `BARRACUDA`;
 set global innodb_large_prefix = `ON`;
 ```
 
 执行下边sql,并复制返回结果执行，然后就会将表的行格式设置为动态类型:
 
-```
+```sql
 SELECT
 	CONCAT( 'ALTER TABLE `', TABLE_NAME, '` ROW_FORMAT=DYNAMIC;' ) AS 'Copy & run these SQL statements:' 
 FROM
@@ -222,7 +222,7 @@ WHERE
 
 继续执行sql，并复制返回结果执行,把表的编码进行转换:
 
-```
+```sql
 SELECT
 	CONCAT( 'ALTER TABLE `', TABLE_NAME, '` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;' ) AS 'Copy & run these SQL statements:' 
 FROM
@@ -234,3 +234,9 @@ WHERE
 ```
 
 这样在gitlab里就可以使用`emoji`图标了。对于`postgresql`是可以直接使用`utf8mb4`编码的。而在`mysql5.7`中可以将`ROW_FORMAT = "Dynamic"`这一值设置为默认属性,因此可能不会遇到这个问题。
+
+解决[合并分支出现500问题](https://gitlab.com/gitlab-org/gitlab-ce/issues/49583)
+```sql
+use gitlabhq_production;
+alter table `merge_request_diff_files` modify column `diff` LONGTEXT;
+```
