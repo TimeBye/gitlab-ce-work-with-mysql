@@ -5,7 +5,13 @@ set -e
 GITLAB_BACKUP_EXPIRY=${GITLAB_BACKUP_EXPIRY:-"604800"}
 GITLAB_BACKUP_SCHEDULE=${GITLAB_BACKUP_SCHEDULE:-"disable"}
 RAILS_ENV=${RAILS_ENV:-"production"}
-GITLAB_BACKUP_SKIP=${GITLAB_BACKUP_SKIP:-"repositories"}
+GITLAB_BACKUP_SKIP=${GITLAB_BACKUP_SKIP:-"builds"}
+
+function gitlab_configure_time_zone() {
+    TZ=${TZ:-"Asia/Shanghai"}
+    echo $TZ > /etc/timezone
+    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime
+}
 
 function gitlab_configure_backups_expiry() {
     service cron restart
@@ -59,6 +65,6 @@ if [[ -e /opt/choerodon/paas/etc/gitlab.rb ]]; then
 	chmod 0600 /etc/gitlab/gitlab.rb
 fi
 
+gitlab_configure_time_zone
 gitlab_configure_backups_schedule
 /assets/wrapper
-exec "$@"

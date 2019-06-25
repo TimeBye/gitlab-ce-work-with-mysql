@@ -28,6 +28,7 @@ RUN /bin/bash -l -c "cd /opt/gitlab/embedded/service/gitlab-rails && \
 
 # Issues https://gitlab.com/gitlab-org/gitlab-ce/issues/43514
 # Mysql2::Error: Data too long for column 'query' at row 1: INSERT INTO `prometheus_metrics`
+# Issues https://gitlab.com/gitlab-org/gitlab-ce/issues/49583
 RUN sed -i 's/create_table.*/create_table :lfs_file_locks, options: '"'ROW_FORMAT=DYNAMIC'"' do |t|/' /opt/gitlab/embedded/service/gitlab-rails/db/migrate/20180116193854_create_lfs_file_locks.rb && \
     sed -i 's/t.string :query/t.text :query/' /opt/gitlab/embedded/service/gitlab-rails/db/migrate/20180101160629_create_prometheus_metrics.rb && \
     sed -i 's/t.string "query"/t.text "query"/' /opt/gitlab/embedded/service/gitlab-rails/db/schema.rb
