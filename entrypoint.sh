@@ -29,7 +29,7 @@ function gitlab_configure_backups_schedule() {
     case ${GITLAB_BACKUP_SCHEDULE} in
         daily|weekly|monthly)
             gitlab_configure_backups_expiry
-            GITLAB_BACKUP_TIME=${GITLAB_BACKUP_TIME:-"00:01"}
+            GITLAB_BACKUP_TIME=${GITLAB_BACKUP_TIME:-"04:00"}
             if ! crontab -u `whoami` -l >/tmp/cron.`whoami` 2>/dev/null || ! grep -q 'gitlab:backup:create' /tmp/cron.`whoami`; then
                 echo "Configuring gitlab::backups::schedule..."
                 min=${GITLAB_BACKUP_TIME#*:}
@@ -50,7 +50,7 @@ function gitlab_configure_backups_schedule() {
         advanced)
             gitlab_configure_backups_expiry
             if ! crontab -u `whoami` -l >/tmp/cron.`whoami` 2>/dev/null || ! grep -q 'gitlab:backup:create' /tmp/cron.`whoami`; then
-                echo "${GITLAB_BACKUP_TIME:-"00 01 * * *"} gitlab-rake gitlab:backup:create SKIP=${GITLAB_BACKUP_SKIP} RAILS_ENV=${RAILS_ENV}" >> /tmp/cron.`whoami`
+                echo "${GITLAB_BACKUP_TIME:-"00 04 * * *"} gitlab-rake gitlab:backup:create SKIP=${GITLAB_BACKUP_SKIP} RAILS_ENV=${RAILS_ENV}" >> /tmp/cron.`whoami`
                 crontab -u `whoami` /tmp/cron.`whoami`
             fi
             rm -rf /tmp/cron.`whoami`
